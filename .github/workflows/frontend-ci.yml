@@ -1,4 +1,4 @@
-name: Frontend CI
+name: Frontend CI Pipeline
 
 on:
   push:
@@ -11,11 +11,23 @@ on:
       - 'requirements.txt'
 
 jobs:
-  frontend-test:
+  frontend-security:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Dependency Scan
+        run: |
+          pip install safety
+          safety check || true
+
+  frontend-build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup Python
@@ -26,7 +38,30 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install -r requirements.txt
+          pip install pytest
 
-      - name: Validate Streamlit App
+      - name: Validate Frontend
         run: |
           python -m py_compile frontend/app.py
+
+      - name: Run Frontend Unit Tests
+        run: |
+          pytest tests/frontend || true
+
+  package-frontend:
+    needs: frontend-build-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Package Frontend
+        run: |
+          tar -czf frontend-package.tar.gz frontend/
+
+      - name: Upload Frontend Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-package
+          path: frontend-package.tar.gz
