@@ -1,0 +1,32 @@
+name: Backend CI
+
+on:
+  push:
+    paths:
+      - 'backend/**'
+      - 'requirements.txt'
+  pull_request:
+    paths:
+      - 'backend/**'
+      - 'requirements.txt'
+
+jobs:
+  backend-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Validate FastAPI App
+        run: |
+          python -m py_compile backend/main.py
