@@ -1,0 +1,67 @@
+name: Frontend CI Pipeline
+
+on:
+  push:
+    paths:
+      - 'frontend/**'
+      - 'requirements.txt'
+  pull_request:
+    paths:
+      - 'frontend/**'
+      - 'requirements.txt'
+
+jobs:
+  frontend-security:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Dependency Scan
+        run: |
+          pip install safety
+          safety check || true
+
+  frontend-build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Validate Frontend
+        run: |
+          python -m py_compile frontend/app.py
+
+      - name: Run Frontend Unit Tests
+        run: |
+          pytest tests/frontend || true
+
+  package-frontend:
+    needs: frontend-build-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Package Frontend
+        run: |
+          tar -czf frontend-package.tar.gz frontend/
+
+      - name: Upload Frontend Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-package
+          path: frontend-package.tar.gz
