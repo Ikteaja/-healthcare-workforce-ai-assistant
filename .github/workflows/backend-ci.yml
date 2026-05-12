@@ -1,17 +1,31 @@
-name: Backend CI
+name: Backend CI Pipeline
 
 on:
   push:
     paths:
       - 'backend/**'
+      - 'tests/**'
       - 'requirements.txt'
   pull_request:
     paths:
       - 'backend/**'
+      - 'tests/**'
       - 'requirements.txt'
 
 jobs:
-  backend-test:
+  security-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Dependency Security Scan
+        run: |
+          pip install safety
+          safety check || true
+
+  backend-build-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,7 +40,34 @@ jobs:
       - name: Install Dependencies
         run: |
           pip install -r requirements.txt
+          pip install pytest httpx
 
-      - name: Validate FastAPI App
+      - name: Run Unit Tests
+        run: |
+          pytest tests/unit
+
+      - name: Run Integration Tests
+        run: |
+          pytest tests/integration
+
+      - name: Build Validation
         run: |
           python -m py_compile backend/main.py
+
+  package-backend:
+    needs: backend-build-test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Package Backend Artifact
+        run: |
+          tar -czf backend-package.tar.gz backend/
+
+      - name: Upload Backend Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-package
+          path: backend-package.tar.gz
