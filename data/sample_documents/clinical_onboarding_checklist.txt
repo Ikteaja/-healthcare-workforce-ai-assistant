@@ -1,0 +1,6 @@
+Clinical Workforce Onboarding Checklist
+
+1. Verify license, certification, background screening, immunization status, and role-specific competencies before the first scheduled shift.
+2. Assign each new hire a preceptor and document orientation milestones in the learning management system.
+3. Confirm completion of electronic health record training, emergency preparedness training, infection prevention education, and workplace violence prevention modules.
+4. Review escalation paths for staffing concerns, patient safety events, and compliance questions.

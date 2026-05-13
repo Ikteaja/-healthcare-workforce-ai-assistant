@@ -158,6 +158,9 @@ main
 | ChromaDB Integration | Implemented |
 | GHCR Container Registry | Implemented |
 | Environment Configuration | Implemented |
+| Enterprise Document Ingestion Workflow | Implemented |
+| PDF/TXT Document Upload | Implemented |
+| Document Chunk Processing | Implemented |
 
 ---
 
@@ -165,8 +168,6 @@ main
 
 | Future Phase | Status |
 |---|---|
-| PDF Document Upload | Planned |
-| Enterprise RAG Ingestion | Planned |
 | Embedding Generation | Planned |
 | Semantic Search | Planned |
 | Chat API | Planned |
@@ -181,6 +182,38 @@ main
 | ArgoCD Integration | Planned |
 | RBAC Security | Planned |
 | Enterprise Secrets Management | Planned |
+
+---
+
+
+# Enterprise Document Ingestion Workflow
+
+The backend provides a modular FastAPI ingestion workflow for enterprise healthcare workforce documents.
+
+## Upload Endpoint
+
+```text
+POST /documents/upload
+```
+
+Supported document types:
+
+- PDF (`.pdf`)
+- TXT (`.txt`)
+
+Uploaded source files are stored under `data/uploads/`. Extracted text is split with LangChain `RecursiveCharacterTextSplitter`, and processed chunk JSON files are stored under `data/processed/`. Each chunk includes the source filename, UTC upload timestamp, chunk index, chunk content, and document type.
+
+## Backend Modules
+
+```text
+backend/
+ ├── api/
+ ├── models/
+ ├── services/
+ └── main.py
+```
+
+Sample healthcare workforce documents are available in `data/sample_documents/`.
 
 ---
 

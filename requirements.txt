@@ -7,3 +7,8 @@ ollama
 pydantic
 python-dotenv
 mlflow
+langchain-text-splitters
+pypdf
+python-multipart
+pytest
+httpx
